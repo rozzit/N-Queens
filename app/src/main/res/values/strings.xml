@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">N-Queens</string>
+    <string name="app_name">QueenTree</string>
+    <string name="title">Queen\nTree</string>
+    <string name="onePlayerButtonText">1-Player</string>
+    <string name="twoPlayerButtonText">2-Player</string>
+    <string name="titleGifDescripton">gif of small connected graph</string>
+    <string name="AIDifficultyTitle">AI Difficulty</string>
+    <string name="BoardSizeSelectionTitle">Board Size</string>
+    <string-array name="possibleBoardDimensions">
+        <item>8 × 8</item>
+        <item>10 × 10</item>
+        <item>12 × 12</item>
+        <item>16 × 16</item>
+        <item>32 × 32</item>
+    </string-array>
 </resources>
