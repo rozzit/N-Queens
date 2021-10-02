@@ -161,9 +161,7 @@ public class PlayGameActivity extends AppCompatActivity
                 squareRect.top = squareTopCornerY;
                 squareRect.right = squareTopCornerX + squareWidthPixels;
                 squareRect.bottom = squareTopCornerY + squareHeightPixels;
-                boardSquares[r][c] = new BoardSquare(this, r, c);
-                boardSquares[r][c].setBackgroundColor(checkerboardColors[(r + c) % 2]);
-                boardSquares[r][c].setOnClickListener(boardSquares[r][c].MakeOnClickListener());
+                boardSquares[r][c] = new BoardSquare(this, r, c, checkerboardColors[(r + c) % 2]);
 
                 TableRow.LayoutParams boardSquareLayoutParams = new TableRow.LayoutParams();
                 boardSquareLayoutParams.width = 0;
