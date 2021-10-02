@@ -31,6 +31,7 @@ public class PlayGameActivity extends AppCompatActivity
     private static final int[] checkerboardColors = new int[]{Color.rgb(0, 0, 0), Color.rgb(255, 255, 255)};
     private static final Paint[] checkerboardColorsPaint = makePaintsFromColors();
     private BoardSquare[][] boardSquares;
+    private int layoutMeasuredWidth, layoutMeasuredHeight;
     private int boardWidthPixels, boardHeightPixels, squareWidthPixels,squareHeightPixels, boardTopLeftCornerX, boardTopLeftCornerY;
 
 
@@ -97,15 +98,24 @@ public class PlayGameActivity extends AppCompatActivity
 
         final TableLayout tableLayout = new TableLayout(this);
         tableLayout.setGravity(Gravity.CENTER_VERTICAL);
-        // TableLayout.LayoutParams tableLayoutParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL); //TableLayout.LayoutParams.MATCH_PARENT);
         tableLayout.setId(ViewCompat.generateViewId());
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenHeight = displayMetrics.heightPixels;
+        int screenWidth = displayMetrics.widthPixels;
+        int verticalBoardMargin = (int) Math.round(screenHeight * borderProportion);
+        int horizontalBoardMargin = (int) Math.round(screenWidth * borderProportion);
+
+        /*
         ViewTreeObserver vto = tableLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 tableLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int layoutMeasuredWidth  = tableLayout.getMeasuredWidth();
-                int layoutMeasuredHeight = tableLayout.getMeasuredHeight();
+                layoutMeasuredWidth  = tableLayout.getMeasuredWidth();
+                layoutMeasuredHeight = tableLayout.getMeasuredHeight();
+                Toast.makeText(getBaseContext(), "ViewWidth = " + layoutMeasuredWidth, Toast.LENGTH_SHORT).show();
                 Toast.makeText(getBaseContext(), "ViewHeight = " + layoutMeasuredHeight, Toast.LENGTH_SHORT).show();
 
                 DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -133,16 +143,15 @@ public class PlayGameActivity extends AppCompatActivity
                 squareHeightPixels = boardHeightPixels / rows;
             }
         });
-
-        TableRow.LayoutParams boardSquareLayoutParams = new TableRow.LayoutParams();
-        boardSquareLayoutParams.width = 0;
-        boardSquareLayoutParams.weight = (float)(1.0f - 2*borderProportion) / cols;
-
+        */
         boardSquares = new BoardSquare[rows][cols];
         for(int r =  0; r < rows; r++)
         {
             TableRow tableRow = new TableRow(this);
-            tableRow.setGravity(Gravity.CENTER_HORIZONTAL);
+            // tableRow.setGravity(Gravity.CENTER_HORIZONTAL);
+            TableRow.LayoutParams rowLayoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+            tableRow.setLayoutParams(rowLayoutParams);
+
             for(int c = 0; c < cols; c++)
             {
                 int squareTopCornerX = boardTopLeftCornerX + squareWidthPixels*c;
@@ -155,11 +164,32 @@ public class PlayGameActivity extends AppCompatActivity
                 boardSquares[r][c] = new BoardSquare(this, r, c);
                 boardSquares[r][c].setBackgroundColor(checkerboardColors[(r + c) % 2]);
                 boardSquares[r][c].setOnClickListener(boardSquares[r][c].MakeOnClickListener());
+
+                TableRow.LayoutParams boardSquareLayoutParams = new TableRow.LayoutParams();
+                boardSquareLayoutParams.width = 0;
+                boardSquareLayoutParams.weight = (float)(1.0f - 2*borderProportion) / cols;
+                if(c == 0) {
+                    boardSquareLayoutParams.leftMargin = horizontalBoardMargin;
+                }
+                if(c == cols - 1) {
+                    boardSquareLayoutParams.rightMargin = horizontalBoardMargin;
+                }
+                if(r == 0) {
+                    boardSquareLayoutParams.topMargin = verticalBoardMargin;
+                }
+                if(r == rows - 1) {
+                    boardSquareLayoutParams.bottomMargin = verticalBoardMargin;
+                }
                 boardSquares[r][c].setLayoutParams(boardSquareLayoutParams);
                 tableRow.addView(boardSquares[r][c]);
             }
             tableLayout.addView(tableRow);
         }
+        // TableLayout.LayoutParams tableLayoutParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL); //TableLayout.LayoutParams.MATCH_PARENT);
+        // tableLayoutParams.topMargin = boardTopLeftCornerY;
+        // tableLayoutParams.bottomMargin = boardTopLeftCornerY + boardHeightPixels;
+        // tableLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+        // tableLayout.setLayoutParams(tableLayoutParams);
         setContentView(tableLayout);
     }
 

@@ -36,6 +36,16 @@ public class BoardSquare extends AppCompatButton
         };
     }
 
+    @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+        super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int size = width > height ? height : width;
+        setMeasuredDimension(size, size); // make it square
+    }
+
 
 }
 
