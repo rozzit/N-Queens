@@ -10,6 +10,7 @@ import android.transition.Slide;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.SeekBar;
 
 import com.example.n_queens.R;
 
@@ -24,8 +25,13 @@ public class SelectAIDifficultyActivity extends AppCompatActivity {
 
     public void launchBoardSizeSelection(View view)
     {
+        SeekBar aiDifficultyBar = (SeekBar) findViewById(R.id.difficultySeekbar);
+
+        double difficulty = aiDifficultyBar.getProgress() / 100.0;
         Intent selectBoardSizeIntent = new Intent(this, SelectBoardSizeActivity.class);
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
+        Bundle bundle = options.toBundle();
+        bundle.putDouble("AIDifficulty", difficulty);
         startActivity(selectBoardSizeIntent, options.toBundle());
     }
 

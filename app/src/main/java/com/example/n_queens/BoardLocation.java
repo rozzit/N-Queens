@@ -21,6 +21,19 @@ public class BoardLocation
     {
         return "{row=" + row + ", col=" + col + "}";
     }
+
+    public int manhattanDistanceTo(BoardLocation loc)
+    {
+        return Math.abs(row - loc.row) + Math.abs(col - loc.col);
+    }
+
+    public double euclideanDistanceTo(BoardLocation loc)
+    {
+        int dr = row - loc.row;
+        int dc = col - loc.col;
+        return Math.sqrt(dr * dr + dc * dc);
+    }
+
     @Override
     public boolean equals(Object o)
     {

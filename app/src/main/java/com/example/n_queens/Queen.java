@@ -29,14 +29,12 @@ public class Queen
         // all horizontally reachable positions
         for(int col = 0; col < board.getSideLength(); col++)
         {
-            if(location.getCol() != col)
-                reachableLocations.add(new BoardLocation(location.getRow(), col));
+            reachableLocations.add(new BoardLocation(location.getRow(), col));
         }
         // all vertically reachable positions
         for(int row = 0; row < board.getSideLength(); row++)
         {
-            if(location.getRow() != row)
-                reachableLocations.add(new BoardLocation(row, location.getCol()));
+            reachableLocations.add(new BoardLocation(row, location.getCol()));
         }
         // down-right diagonal
         for(int col = location.getCol() + 1, row = location.getRow() + 1; !board.isOutOfBounds(col, row); col++, row++)

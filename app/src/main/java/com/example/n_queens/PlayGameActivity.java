@@ -5,6 +5,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.view.ViewCompat;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -24,6 +27,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
+import java.util.HashSet;
+
 public class PlayGameActivity extends AppCompatActivity
 {
     private static final double borderProportion = 0.05;
@@ -31,6 +36,7 @@ public class PlayGameActivity extends AppCompatActivity
     private static final int[] checkerboardColors = new int[]{Color.rgb(0, 0, 0), Color.rgb(255, 255, 255)};
     private static final Paint[] checkerboardColorsPaint = makePaintsFromColors();
     private BoardSquare[][] boardSquares;
+    private Board board;
     private int layoutMeasuredWidth, layoutMeasuredHeight;
     private int boardWidthPixels, boardHeightPixels, squareWidthPixels,squareHeightPixels, boardTopLeftCornerX, boardTopLeftCornerY;
 
@@ -144,6 +150,7 @@ public class PlayGameActivity extends AppCompatActivity
             }
         });
         */
+        board = new Board(rows);
         boardSquares = new BoardSquare[rows][cols];
         for(int r =  0; r < rows; r++)
         {
@@ -191,8 +198,48 @@ public class PlayGameActivity extends AppCompatActivity
         setContentView(tableLayout);
     }
 
+    public void flipAllReachableSquaresFrom(BoardLocation startLocation)
+    {
+        HashSet<BoardLocation> reachableLocations = Queen.reachableLocationsFrom(startLocation, board);
+        AnimatorSet allAnimations = new AnimatorSet();
+        allAnimations.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                disableAllBoardSquares(); // it's turned back on at the end of the method, its so the user can't keep clicking and resetting the animation
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                enableAllBoardSquares();
+            }
+        });
+        int startTimePropagationVelocityCellsPerSec = 4;
+        for(BoardLocation loc : reachableLocations)
+        {
+            AnimatorSet animations = boardSquares[loc.getRow()][loc.getCol()].changeColorAndRotateAnimation();
+            double distanceToStartCell = startLocation.euclideanDistanceTo(loc);
+            animations.setStartDelay((int)(distanceToStartCell / startTimePropagationVelocityCellsPerSec * 1000));
+            allAnimations.playTogether(animations);
+        }
+        allAnimations.start();
+    }
 
+    public void disableAllBoardSquares()
+    {
+        for(int r =  0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                boardSquares[r][c].setEnabled(false);
+            }
+        }
+    }
 
+    public void enableAllBoardSquares()
+    {
+        for(int r =  0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                boardSquares[r][c].setEnabled(true);
+            }
+        }
+    }
 
     private static Paint[] makePaintsFromColors()
     {

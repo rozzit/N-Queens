@@ -27,93 +27,76 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class BoardSquare extends AppCompatButton implements View.OnClickListener
 {
-    private int row, col;
-    private static int spinAnimationStartAngleDeg = 0, spinAnimationEndAngleDeg = 720;
+    private BoardLocation boardLocation;
+    private static int spinAnimationStartAngleDeg = 0, spinAnimationEndAngleDeg = 540;
+    private static int spimAnimationDurationMilliseconds = 1000;
     private int backgroundColor;
     public BoardSquare(Context context, int row, int col, int backgroundColor)
     {
         super(context);
-        this.row = row;
-        this.col = col;
+        boardLocation = new BoardLocation(row, col);
         setBackgroundColor(backgroundColor);
         setOnClickListener(this);
     }
-
+    public BoardLocation getLocation()
+    {
+        return boardLocation;
+    }
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int size = Math.min(width, height);
         setMeasuredDimension(size, size); // make it square
     }
 
-
     @Override
     public void onClick(View view)
     {
-        AppCompatButton thisRef = this;
+        Toast.makeText(getContext(), "Row = " + boardLocation.getRow() + "   Col = " + boardLocation.getCol(), Toast.LENGTH_SHORT).show();
+        PlayGameActivity currentActivity = (PlayGameActivity) this.getContext();
+        currentActivity.flipAllReachableSquaresFrom(this.boardLocation);
+    }
 
-        // setBackgroundColor(Color.rgb(0, 0, 255));
-
-            /*
-        RotateAnimation spinAnimation = new RotateAnimation(spinAnimationStartAngleDeg, spinAnimationEndAngleDeg,
-                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        spinAnimation.setDuration(2000);
-        spinAnimation
-        */
+    public AnimatorSet changeColorAndRotateAnimation()
+    {
 
         AnimatorSet animations = new AnimatorSet();
-
-        animations.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                setEnabled(false); // it's turned back on at the end of the method, its so the user can't keep clicking and resetting the animation
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                setEnabled(true);
-            }
-        });
-
-        ObjectAnimator spinAnimation = ObjectAnimator.ofFloat(view, "rotationX", spinAnimationStartAngleDeg, spinAnimationEndAngleDeg);
-        spinAnimation.setDuration(1000);
+        ObjectAnimator spinAnimation = ObjectAnimator.ofFloat(this, "rotationX", spinAnimationStartAngleDeg, spinAnimationEndAngleDeg);
+        spinAnimation.setDuration(spimAnimationDurationMilliseconds);
         spinAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-
 
         ValueAnimator colorAnimation = ValueAnimator.ofArgb(this.getBackgroundColor(), Color.BLUE);
         colorAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        colorAnimation.setDuration(1000); // milliseconds
+        colorAnimation.setDuration(spimAnimationDurationMilliseconds);
 
+        AppCompatButton _this = this; // need a reference to 'this' in the following listener
         colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
-                thisRef.setBackgroundColor((int) animator.getAnimatedValue());
+                _this.setBackgroundColor((int) animator.getAnimatedValue());
             }
-
         });
-
-
-
         animations.play(spinAnimation).with(colorAnimation);
-        animations.start();
-
-        Toast.makeText(getContext(), "Row = " + row + "   Col = " + col, Toast.LENGTH_SHORT).show();
+        return animations;
+        // animations.start();
     }
 
-    // this may look redundant, but I haven't found a way to access the background color of an AppCompatButton,
-    // only how to set it.
-    public int getBackgroundColor()
-    {
-        return this.backgroundColor;
-    }
+    // This may look redundant, but I haven't found a way to access the background color of an AppCompatButton,
+    // only how to set it. This is a workaround.
     @Override
     public void setBackgroundColor(int color)
     {
         super.setBackgroundColor(color);
         backgroundColor = color;
     }
+    public int getBackgroundColor()
+    {
+        return this.backgroundColor;
+    }
+
 }
 
 
